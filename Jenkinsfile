@@ -41,7 +41,6 @@ pipeline {
             }
         }
         stage('Compile and Run Sonar Analysis') {
-            def scannerHome = tool 'SonarQube MSBuild';
             steps {
                 script {
                     try {
@@ -60,6 +59,7 @@ pipeline {
                             sh 'pip install -r requirements.txt'
                             sh 'sonar-scanner' // Run SonarCloud analysis for Python application
                         } else if (fileExists('Discusslt.sln')) {
+                            def scannerHome = tool 'SonarQube MSBuild'
                             withSonarQubeEnv('SonarQube') {
                                 bat "dotnet ${scannerHome}\\SonarScanner.MSBuild.dll begin /k:\"Dotnet-project\""
                                 bat "dotnet build"
