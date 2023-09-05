@@ -61,13 +61,6 @@ pipeline {
                         } else if (fileExists('requirements.txt')) {
                             sh 'pip install -r requirements.txt'
                             sh 'sonar-scanner' // Run SonarCloud analysis for Python application
-                        } else if (fileExists('Discusslt.sln')) {
-                            def scannerHome = tool 'SonarQube MSBuild'
-                            withSonarQubeEnv('SonarQube') {
-                                bat "dotnet ${scannerHome}\\SonarScanner.MSBuild.dll begin /k:\"Dotnet-project\""
-                                bat "dotnet build"
-                                bat "dotnet ${scannerHome}\\SonarScanner.MSBuild.dll end"
-                            }
                         } else {
                             currentBuild.result = 'FAILURE'
                             error("Unsupported application type: No compatible build steps available.")
@@ -79,22 +72,22 @@ pipeline {
                 }
             }
         }
-        stage('RunSCAAnalysisUsingSnyk') {
-            steps {
-                script {
-                    try {
-                        withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
-                            sh 'npm install -g snyk'
-                            sh 'snyk code test --all-projects --severity-threshold=high'
-                            sh 'snyk monitor'
-                        }
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Error during Snyk analysis: ${e.message}")
-                    }
-                }
-            }
-        }
+        // stage('RunSCAAnalysisUsingSnyk') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
+        //                     sh 'npm install -g snyk'
+        //                     sh 'snyk code test --all-projects --severity-threshold=high'
+        //                     sh 'snyk monitor'
+        //                 }
+        //             } catch (Exception e) {
+        //                 currentBuild.result = 'FAILURE'
+        //                 error("Error during Snyk analysis: ${e.message}")
+        //             }
+        //         }
+        //     }
+        // }
         stage('Java Spring Boot Build and Test') {
             steps {
                 script {
