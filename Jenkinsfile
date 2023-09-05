@@ -85,7 +85,7 @@ pipeline {
                     try {
                         withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
                             sh 'npm install -g snyk'
-                            sh 'snyk code test --all-projects --severity-threshold=<high>'
+                            sh 'snyk code test --all-projects --severity-threshold=high'
                             sh 'snyk monitor'
                         }
                     } catch (Exception e) {
