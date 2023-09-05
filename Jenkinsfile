@@ -1,20 +1,20 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven_3_5_2'
-        nodejs 'NodeJS_14'
-        go 'Go_1_17'
-        ruby 'Ruby_3_0'
-        python 'Python_3_9'
-        dockerTool 'Docker_20_10_8'
-        kubectl 'kubectl_1_21_4'
-        awsCli 'AWS_Cli_2_2_22'
-        terraform 'Terraform_1_0_9'
-        git 'Git_2_33_0'
-        androidSdk 'Android_SDK'
-        xcode 'Xcode_12'
-        ruby 'Ruby_3_0'
-        nodejs 'NodeJS_14'
+        maven 'Maven'
+        nodejs 'NodeJS'
+        // go 'Go_1_17'
+        // ruby 'Ruby_3_0'
+        // python 'Python_3_9'
+        // dockerTool 'Docker_20_10_8'
+        // kubectl 'kubectl_1_21_4'
+        // awsCli 'AWS_Cli_2_2_22'
+        // terraform 'Terraform_1_0_9'
+        // git 'Git_2_33_0'
+        // androidSdk 'Android_SDK'
+        // xcode 'Xcode_12'
+        // ruby 'Ruby_3_0'
+        // nodejs 'NodeJS_14'
         // Add More tools as needed
     }
     stages {
@@ -27,12 +27,12 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Function to detect Java version
-                        def javaVersion = detectJavaVersion()
+                        // // Function to detect Java version
+                        // def javaVersion = detectJavaVersion()
 
-                        // Set the Java version for the pipeline
-                        env.JAVA_HOME = javaVersion
-                        tool name: "Java_${javaVersion}", type: 'jdk'
+                        // // Set the Java version for the pipeline
+                        // env.JAVA_HOME = javaVersion
+                        tool name: "Java", type: 'jdk'
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Error during Java version detection: ${e.message}")
@@ -40,41 +40,42 @@ pipeline {
                 }
             }
         }
-        stage('Compile and Run Sonar Analysis') {
-            steps {
-                script {
-                    try {
-                        if (fileExists('pom.xml')) {
-                            sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=bwa -Dsonar.organization=bwa -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=89b294d895aa5348e3434a5cfb85dd6320aebc72'
-                        } else if (fileExists('package.json')) {
-                            sh 'npm install -g sonarqube-scanner'
-                            sh 'npm run sonar-scanner' // Run SonarCloud analysis for Node.js application
-                        } else if (fileExists('go.mod')) {
-                            sh 'go mod download'
-                            sh 'sonar-scanner' // Run SonarCloud analysis for Go application
-                        } else if (fileExists('Gemfile')) {
-                            sh 'bundle install'
-                            sh 'sonar-scanner' // Run SonarCloud analysis for Ruby application
-                        } else if (fileExists('requirements.txt')) {
-                            sh 'pip install -r requirements.txt'
-                            sh 'sonar-scanner' // Run SonarCloud analysis for Python application
-                        } else {
-                            currentBuild.result = 'FAILURE'
-                            error("Unsupported application type: No compatible build steps available.")
-                        }
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Error during Sonar analysis: ${e.message}")
-                    }
-                }
-            }
-        }
+        // stage('Compile and Run Sonar Analysis') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 if (fileExists('pom.xml')) {
+        //                     sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=bwa -Dsonar.organization=bwa -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=89b294d895aa5348e3434a5cfb85dd6320aebc72'
+        //                 } else if (fileExists('package.json')) {
+        //                     sh 'npm install -g sonarqube-scanner'
+        //                     sh 'npm run sonar-scanner' // Run SonarCloud analysis for Node.js application
+        //                 } else if (fileExists('go.mod')) {
+        //                     sh 'go mod download'
+        //                     sh 'sonar-scanner' // Run SonarCloud analysis for Go application
+        //                 } else if (fileExists('Gemfile')) {
+        //                     sh 'bundle install'
+        //                     sh 'sonar-scanner' // Run SonarCloud analysis for Ruby application
+        //                 } else if (fileExists('requirements.txt')) {
+        //                     sh 'pip install -r requirements.txt'
+        //                     sh 'sonar-scanner' // Run SonarCloud analysis for Python application
+        //                 } else {
+        //                     currentBuild.result = 'FAILURE'
+        //                     error("Unsupported application type: No compatible build steps available.")
+        //                 }
+        //             } catch (Exception e) {
+        //                 currentBuild.result = 'FAILURE'
+        //                 error("Error during Sonar analysis: ${e.message}")
+        //             }
+        //         }
+        //     }
+        // }
         stage('RunSCAAnalysisUsingSnyk') {
             steps {
                 script {
                     try {
                         withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
-                            sh 'mvn snyk:test -fn'
+                            sh 'npm install -g snyk'
+                            sh 'snyk monitor --all-projects'
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
@@ -102,7 +103,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        if (fileExists('YourSolution.sln')) {
+                        if (fileExists('Discusslt.sln')) {
                             sh 'dotnet build'
                             sh 'dotnet test'
                         }
