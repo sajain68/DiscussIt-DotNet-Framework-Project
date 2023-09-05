@@ -41,9 +41,7 @@ pipeline {
             }
         }
         stage('Compile and Run Sonar Analysis') {
-            environment {
-                scannerHome = tool 'SonarQube MSBuild'
-            }
+            def scannerHome = tool 'SonarQube MSBuild';
             steps {
                 script {
                     try {
